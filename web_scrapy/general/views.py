@@ -43,35 +43,41 @@ def CreateXLSX(attr_list):
 class ScrapyView(views.APIView):
 
     def get(self, request, *args, **kwargs):
-        page = requests.get('http://ds.iris.edu/seismon/eventlist/index.phtml')
-        soup = BeautifulSoup(page.text, 'html.parser')
-        body = soup.body
-        table = soup.find( 'table', { 'class' : 'tablesorter'} ) 
-        trs = table.find_all('tr')
-        attr_list = []
-        for tr in trs[1:]:
-            attr_list.append({
-                "DATA E HORA (UTC)": tr.find_all('td')[0].get_text(strip=True),
-                "LAT": tr.find_all('td')[1].get_text(strip=True),                
-                "LONG": tr.find_all('td')[2].get_text(strip=True),
-                "MAG": tr.find_all('td')[3].get_text(strip=True),
-                "PROFUNDIDADE (km)": tr.find_all('td')[4].get_text(strip=True),
-                "LOCAL": tr.find_all('td')[5].get_text(strip=True),
-                "IRIS DETALHES": "http://ds.iris.edu/ds/nodes/dmc/tools/event/"+tr.find_all('td')[6].get_text(strip=True)                
-            })
-        CreateXLSX(attr_list)        
-        return Response({"earthquakess": attr_list})
+        try:
+            page = requests.get('http://ds.iris.edu/seismon/eventlist/index.phtml')
+            soup = BeautifulSoup(page.text, 'html.parser')
+            body = soup.body
+            table = soup.find( 'table', { 'class' : 'tablesorter'} ) 
+            trs = table.find_all('tr')
+            attr_list = []
+            for tr in trs[1:]:
+                attr_list.append({
+                    "DATA E HORA (UTC)": tr.find_all('td')[0].get_text(strip=True),
+                    "LAT": tr.find_all('td')[1].get_text(strip=True),                
+                    "LONG": tr.find_all('td')[2].get_text(strip=True),
+                    "MAG": tr.find_all('td')[3].get_text(strip=True),
+                    "PROFUNDIDADE (km)": tr.find_all('td')[4].get_text(strip=True),
+                    "LOCAL": tr.find_all('td')[5].get_text(strip=True),
+                    "IRIS DETALHES": "http://ds.iris.edu/ds/nodes/dmc/tools/event/"+tr.find_all('td')[6].get_text(strip=True)                
+                })
+            CreateXLSX(attr_list)        
+            return Response({"earthquakess": attr_list})
+        except Exception as e:
+            return Response({"erro": str(e)})         
 
 class FileView(views.APIView):
     def get(self, request, *args, **kwargs):
-        now = str(datetime.datetime.now())[:19]
-        now = now.replace(":","_")
+        try:
+            now = str(datetime.datetime.now())[:19]
+            now = now.replace(":","_")
 
-        src="earthquakes.xlsx"
-        dst="media/"+str(now)+"-earthquakes.xlsx"
-        shutil.copy(src,dst)
-        model = EarthquakeXLSX()
-        model.xlsx_file = str(now)+"-earthquakes.xlsx"
-        model.save()
-        serializer = EarthquakeXLSXSerializer(model)
-        return Response({"file": serializer.data})  
+            src="earthquakes.xlsx"
+            dst="media/"+str(now)+"-earthquakes.xlsx"
+            shutil.copy(src,dst)
+            model = EarthquakeXLSX()
+            model.xlsx_file = str(now)+"-earthquakes.xlsx"
+            model.save()
+            serializer = EarthquakeXLSXSerializer(model)
+            return Response({"file": serializer.data})  
+        except Exception as e:
+            return Response({"erro": str(e)})
