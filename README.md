@@ -15,8 +15,8 @@ APS Unip 5th Semester. Computer Science Course. Web Scraping project with Python
  $ pip install virtualenv
  $ virtualenv venv -p python
  $ ./venv/scripts/activate
- $ pip install -r requirements.txt
  $ cd web_scrapy
+ $ pip install -r requirements.txt
  $ python manage.py collectstatic
  $ python manage.py migrate
  $ python manage.py createsuperuser
