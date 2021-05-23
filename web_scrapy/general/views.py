@@ -12,8 +12,8 @@ import shutil
 import datetime
 import xlsxwriter
 import os
-
-
+from django.shortcuts import render
+  
 # Create your views here.
 
 def CreateXLSX(attr_list):
@@ -81,3 +81,7 @@ class FileView(views.APIView):
             return Response({"file": serializer.data})  
         except Exception as e:
             return Response({"erro": str(e)})
+
+
+def earthquakes_view(request):
+    return render(request, "earthquakes_details.html")

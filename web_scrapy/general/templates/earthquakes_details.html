@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      table, th, td {
+        border: 2px solid black;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 5px;
+        text-align: center;
+      }
+      th {
+        text-align: center;
+      }
+      h1 {
+        text-align: center;
+      }
+    </style>
+    <title>Earthquakes Details</title>
+  </head>
+  <body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+
+    window.onload = function() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:8000/api/search/',
+            success: function(data) {
+                var dados = data;
+                $.each(dados.earthquakess, function(i, item) {
+                var $tr = $('<tr>').append(
+                    $('<td>').text(item['DATA E HORA (UTC)']),
+                    $('<td>').text(item['LAT']),
+                    $('<td>').text(item['LONG']),
+                    $('<td>').text(item['MAG']),
+                    $('<td>').text(item['PROFUNDIDADE (km)']),
+                    $('<td>').text(item['LOCAL']),
+                    $('<td>').append($('<a target="_blank" href="'+item['IRIS DETALHES']+'">').text(item['IRIS DETALHES']))
+                ).appendTo('#records_table');
+            });
+            }
+        });  
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:8000/api/file/',
+            success: function(data) {
+                $('#download_xlsx').attr('href', data.file.xlsx_file);
+            }
+          });           
+        
+    };
+    
+
+  </script>
+  <h1>Detalhes sobre os terremotos</h1>
+  <a download id='download_xlsx'> Download XLSX</a> 
+    <table style="width:100%;">
+        <thead>
+            <th>DATA E HORA (UTC)</th>
+            <th>LAT</th>
+            <th>LONG</th>
+            <th>MAG</th>
+            <th>PROFUNDIDADE (km)</th>
+            <th>LOCAL</th>
+            <th>IRIS DETALHES</th>
+        </thead>
+        <tbody id='records_table'>
+        </tbody>
+    </table>
+  </body>
+</html>
